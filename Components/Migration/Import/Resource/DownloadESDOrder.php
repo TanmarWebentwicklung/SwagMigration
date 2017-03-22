@@ -74,11 +74,6 @@ class DownloadESDOrder extends AbstractResource
                 continue;
             }
 
-            $this->increaseProgress();
-            if ($this->newRequestNeeded()) {
-                return $this->getProgress();
-            }
-
             $esdId = Shopware()->Db()->fetchOne(
                 "SELECT id FROM s_articles_esd WHERE file = ? LIMIT 1",
                 [$filename]
@@ -108,6 +103,11 @@ class DownloadESDOrder extends AbstractResource
                 "UPDATE s_order SET cleared = 12 WHERE ordernumber = ?",
                 [$orderNumber]
             );
+            
+            $this->increaseProgress();
+            if ($this->newRequestNeeded()) {
+                return $this->getProgress();
+            }
         }
 
         return $this->getProgress()->done();

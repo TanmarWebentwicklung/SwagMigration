@@ -91,6 +91,11 @@ class Order extends AbstractResource
         if ($call["profile"] != "WooCommerce") {
             while ($order = $result->fetch()) {
                 $this->migrateOrder($order);
+                
+                $this->increaseProgress();
+                if ($this->newRequestNeeded()) {
+                    return $this->getProgress();
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -284,12 +289,6 @@ class Order extends AbstractResource
             Shopware()->Db()->insert('s_order_shippingaddress', $data_shipping);
             Shopware()->Db()->insert('s_order_attributes', $data_attributes);
         }
-
-
-        $this->increaseProgress();
-        if ($this->newRequestNeeded()) {
-            return $this->getProgress();
-        }
     }
 
     /**
@@ -324,6 +323,11 @@ class Order extends AbstractResource
         if ($call["profile"] != "WooCommerce") {
             while ($order = $result->fetch()) {
                 $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
+                
+                $this->increaseProgress();
+                if ($this->newRequestNeeded()) {
+                    return $this->getProgress();
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -460,10 +464,5 @@ class Order extends AbstractResource
             'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
         ];
         Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
-
-        $this->increaseProgress();
-        if ($this->newRequestNeeded()) {
-            return $this->getProgress();
-        }
     }
 }

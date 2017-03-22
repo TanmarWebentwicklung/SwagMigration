@@ -396,6 +396,17 @@ class Category extends AbstractResource
             if (false !== $target_parent) {
                 $category['parent'] = $target_parent;
             } else {
+            	$found = false;
+            	foreach ($this->unmapped as $test) {
+            		if($test['categoryID'] == $category['parentID']) {
+            			$found = true;
+            			break;
+            		}
+            	}
+            	if (!$found) {
+            		unset($this->unmapped[$key]);
+            		$this->increaseProgress();
+            	}
                 continue;
             }
 
@@ -418,7 +429,7 @@ class Category extends AbstractResource
                 var_dump($e->getMessage());
                 Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
                 $this->increaseProgress();
-                exit();
+                continue;
             }
         }
 

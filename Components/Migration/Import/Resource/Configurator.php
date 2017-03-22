@@ -68,6 +68,11 @@ class Configurator extends AbstractResource
         if ($call["profile"] != "WooCommerce") {
             while ($product = $products_result->fetch()) {
                 $this->migrateConfigurator($product);
+                
+                $this->increaseProgress();
+                if ($this->newRequestNeeded()) {
+                    return $this->getProgress();
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -190,11 +195,6 @@ class Configurator extends AbstractResource
         if ($configurator_type > 0) {
             $sql = "UPDATE `s_article_configurator_sets` SET `type`={$configurator_type} WHERE `id`={$configuratorSetId}";
             Shopware()->Db()->query($sql);
-        }
-
-        $this->increaseProgress();
-        if ($this->newRequestNeeded()) {
-            return $this->getProgress();
         }
     }
 }

@@ -75,6 +75,11 @@ class Customer extends AbstractResource
         if ($call["profile"] != "WooCommerce") {
             while ($customer = $result->fetch()) {
                 $this->migrateCustomer($customer, $import, $salt);
+                
+                $this->increaseProgress();
+                if ($this->newRequestNeeded()) {
+                    return $this->getProgress();
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -184,11 +189,6 @@ class Customer extends AbstractResource
                     $customer['userID']
                 ]
             );
-        }
-        $this->increaseProgress();
-
-        if ($this->newRequestNeeded()) {
-            return $this->getProgress();
         }
     }
 

@@ -103,10 +103,13 @@ class Product extends AbstractResource
         $this->initTaskTimer();
 
         if ($call["profile"] !== "WooCommerce") {
-            $prodArr = $products->fetchAll();
-
-            foreach ($prodArr as $id => $product) {
+            while ($product = $products->fetch()) {
                 $this->migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call);
+                
+                $this->increaseProgress();
+                if ($this->newRequestNeeded()) {
+                    return $this->getProgress();
+                }
             }
         } elseif ($call["profile"] === "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -338,11 +341,6 @@ class Product extends AbstractResource
         // WooCommerce has no pricegroups to migrate so skip this step
         if ($call["profile"] !== "WooCommerce") {
             $this->getProgress()->addRequestParam('import_prices', true);
-        }
-
-        $this->increaseProgress();
-        if ($this->newRequestNeeded()) {
-            return $this->getProgress();
         }
     }
 

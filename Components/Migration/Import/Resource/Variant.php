@@ -68,6 +68,9 @@ class Variant extends AbstractResource
         if ($call["profile"] != "WooCommerce") {
             while ($product = $products_result->fetch()) {
                 $this->migrateVariant($product);
+                
+                $this->increaseProgress();
+                return $this->getProgress();
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -98,17 +101,12 @@ class Variant extends AbstractResource
             'groups' => $groups
 
         ];
-
-        $this->increaseProgress();
-
         // Return the groups
         // The ExtJS frontend will care of the generation by triggering
         // the default article controller
 
         $this->getProgress()->addRequestParam('params', $params);
         $this->getProgress()->addRequestParam('create_variants', true);
-
-        return $this->getProgress();
     }
 
     /**
